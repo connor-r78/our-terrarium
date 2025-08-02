@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.gegy.terrarium.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+  ],
+  "client": [
+    "fabric.client.PresetEditorMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

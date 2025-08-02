@@ -1,0 +1,83 @@
+plugins {
+  id 'fabric-loom'
+}
+
+base {
+  archivesName = "$mod_id-fabric"
+}
+
+loom {
+  mixin {
+    defaultRefmapName.set("${mod_id}.refmap.json")
+  }
+
+  accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
+
+  runs {
+    client {
+      client()
+      setConfigName 'Fabric Client'
+      ideConfigGenerated true
+      runDir 'run'
+    }
+    server {
+      server()
+      setConfigName 'Fabric Server'
+      ideConfigGenerated true
+      runDir 'run'
+    }
+    data {
+      inherit server
+      name 'Fabric Data Generation'
+      vmArg '-Dfabric-api.datagen'
+      vmArg "-Dfabric-api.datagen.output-dir=${file('src/main/generated')}"
+      vmArg "-Dfabric-api.datagen.modid=${mod_id}"
+      runDir "build/datagen"
+    }
+  }
+  mods {
+    "${mod_id}" {
+      sourceSet project(':common').sourceSets.main
+      sourceSet project.sourceSets.main
+    }
+  }
+}
+
+repositories {
+}
+
+dependencies {
+  implementation project(':common')
+  implementation project(':backend')
+
+  minecraft "com.mojang:minecraft:$minecraft_version"
+  mappings loom.layered {
+    officialMojangMappings()
+    parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
+  }
+
+  modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
+  modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_version"
+
+  implementation include('org.tukaani:xz:1.10')
+
+  implementation "maven.modrinth:DistantHorizonsApi:$distant_horizons_api_version"
+  modRuntimeOnly "maven.modrinth:DistantHorizons:$distant_horizons_version"
+}
+
+sourceSets {
+  main {
+    resources {
+      srcDirs += ['src/main/generated']
+    }
+  }
+}
+
+processResources {
+  from project(':common').sourceSets.main.resources
+}
+
+tasks.withType(JavaCompile).configureEach {
+  it.source(project(':common').sourceSets.main.allSource)
+  it.source(project(':backend').sourceSets.main.allSource)
+}

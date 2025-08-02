@@ -1,0 +1,32 @@
+plugins {
+  id 'net.neoforged.moddev'
+  id 'java-library'
+}
+
+base {
+  archivesName = "$mod_id-common-$minecraft_version"
+}
+
+// TODO: Split client/server source
+neoForge {
+  neoFormVersion = neo_form_version
+  parchment {
+    minecraftVersion = parchment_minecraft
+    mappingsVersion = parchment_version
+  }
+
+  // Bit of a hack, as we don't have this hook for Loom
+  for (final def subProject in rootProject.subprojects) {
+    ideSyncTask subProject.tasks.named('generateModManifests')
+  }
+}
+
+dependencies {
+  implementation project(':backend')
+
+  compileOnly 'org.spongepowered:mixin:0.8.5'
+  compileOnly 'io.github.llamalad7:mixinextras-common:0.3.5'
+  annotationProcessor 'io.github.llamalad7:mixinextras-common:0.3.5'
+
+  compileOnly "maven.modrinth:DistantHorizonsApi:$distant_horizons_api_version"
+}
